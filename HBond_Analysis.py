@@ -20,8 +20,7 @@ temp.close()
 # Adjust Residue Count, establish pairwise matrix #
 ###################################################
 Res_Count=182
-matrix = [[1.]*(Res_Count+1) for _ in range(Res_Count+1)]
-highest=0
+matrix=np.full((Res_Count+1,Res_Count+1),1.)
 
 ##################################################
 # Process File, summing each pairwise            #
@@ -32,13 +31,11 @@ for i in range(1,len(filedata)):
     donor=filedata[i].split()[1].split('_')[1].split('@')[0]
     framecount=int(filedata[i].split()[3])
     matrix[int(donor)][int(acceptor)]+=framecount
-    if (matrix[int(donor)][int(acceptor)]>highest):
-        highest=matrix[int(donor)][int(acceptor)]
         
 ######################################################
 # Adjust to logarithmic scale and normalize from 0-1 #
 ######################################################
-normalization=1/np.log(highest)
+normalization=1/np.log(matrix.max())
 for i in range(Res_Count+1):
     for j in range(Res_Count+1):
         matrix[i][j]=normalization*float(np.log(matrix[i][j]))
