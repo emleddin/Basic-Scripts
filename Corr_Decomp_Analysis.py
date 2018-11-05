@@ -130,12 +130,6 @@ for i in range(Res_WT):
                 Anti_Diff[i][j]=-float(Corr_MU[i][j])+float(Corr_WT[i][j])
 
 
-# Corr_Diff=Corr_Diff/Corr_Diff.max()
-# Anti_Diff=Anti_Diff/Anti_Diff.max()
-# Corr_to_Anti=Corr_to_Anti/Corr_to_Anti.max()
-# Anti_to_Corr=Anti_to_Corr/Anti_to_Corr.max()
-
-la.norm(Anti_Diff)
 ###################
 # Figure Plotting #
 ###################
