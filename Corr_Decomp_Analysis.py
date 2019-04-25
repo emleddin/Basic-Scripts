@@ -87,6 +87,9 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
 ################
 # File Loading #
 ################
+# WT_Filename=input("Please enter the filename for the baseline (usually wildtype) including the full path:  \n>")
+# MU_Filename=input("Please enter the filename for the comparison (usually mutant) including the full path:  \n>")
+# outputfile=input("Please enter an output filename (ending in .png):  \n>")
 WT_Filename="~/path/to/file/WT_correlation_mtrx.dat"
 MU_Filename="~/path/to/file/MU_correlation_mtrx.dat"
 outputfile='~/path/to/file/WT_MU_Correlation_Comparisons.png'
@@ -96,8 +99,8 @@ temp.close()
 temp=open(MU_Filename,"r")
 mutant=temp.readlines()
 temp.close()
-Res_WT=len(wildtype)
-Res_MU=len(mutant)
+Res_WT=len(wildtype)+1
+Res_MU=len(mutant)+1
 
 #########################
 # Matrix Initialization #
@@ -108,16 +111,16 @@ Corr_Diff=np.array(np.zeros(Res_WT*Res_WT,float)).reshape(Res_WT,Res_WT)
 Anti_Diff=np.array(np.zeros(Res_WT*Res_WT,float)).reshape(Res_WT,Res_WT)
 Corr_to_Anti=np.array(np.zeros(Res_WT*Res_WT,float)).reshape(Res_WT,Res_WT)
 Anti_to_Corr=np.array(np.zeros(Res_WT*Res_WT,float)).reshape(Res_WT,Res_WT)
-for i in range(Res_WT):
+for i in range(Res_WT-1):
     Corr_WT.append(wildtype[i].split())
-for i in range(Res_MU):
+for i in range(Res_MU-1):
     Corr_MU.append(mutant[i].split())
     
 #####################
 # Matrix Processing #
 #####################
-for i in range(Res_WT):
-    for j in range(Res_WT):
+for i in range(Res_WT-1):
+    for j in range(Res_WT-1):
         if float(Corr_WT[i][j])>=0:
             if float(Corr_MU[i][j])>=0:
                 Corr_Diff[i][j]=float(Corr_MU[i][j])-float(Corr_WT[i][j])
@@ -129,6 +132,14 @@ for i in range(Res_WT):
             elif float(Corr_MU[i][j])<0:
                 Anti_Diff[i][j]=-float(Corr_MU[i][j])+float(Corr_WT[i][j])
 
+# Setting minimum and maximum ranges to ensure multiple data sets processed via this script are visually comparable.
+Corr_Diff[Res_WT-1][Res_WT-1]=1.0
+Anti_Diff[Res_WT-1][Res_WT-1]=1.0
+Corr_to_Anti[Res_WT-1][Res_WT-1]=2.0
+Anti_to_Corr[Res_WT-1][Res_WT-1]=2.0
+
+Corr_Diff[Res_WT-2][Res_WT-1]=-1.0
+Anti_Diff[Res_WT-2][Res_WT-1]=-1.0
 
 ###################
 # Figure Plotting #
