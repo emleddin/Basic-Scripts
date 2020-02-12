@@ -1,0 +1,87 @@
+import numpy as np
+import os
+import sys
+
+def shift_plane_Bohr(point1,point2,point3,distance=1):
+    (Ax,Ay,Az) = point1
+    (Bx,By,Bz) = point2
+    (Cx,Cy,Cz) = point3
+    a = (By - Ay) * (Cz - Az) - (Cy - Ay) * (Bz - Az)
+    b = (Bz - Az) * (Cx - Ax) - (Cz - Az) * (Bx - Ax)
+    c = (Bx - Ax) * (Cy - Ay) - (Cx - Ax) * (By - Ay)
+    d = -(a*Ax + b*Ay + c*Az)
+    magnitude = np.sqrt(a**2+b**2+c**2)
+    norm_a = a/magnitude*distance
+    norm_b = b/magnitude*distance
+    norm_c = c/magnitude*distance
+    normvec=(norm_a,norm_b,norm_c)
+    new_A =(Ax+normvec[0],Ay+normvec[1],Az+normvec[2])
+    new_B =(Bx+normvec[0],By+normvec[1],Bz+normvec[2])
+    new_C =(Cx+normvec[0],Cy+normvec[1],Cz+normvec[2])
+    return (new_A,new_B,new_C)
+
+def Three_Atom_Plane_Shift(wavefunction,atom1,atom2,atom3,distance):
+    f=open(wavefunction,"r")
+    lines = f.readlines()
+    f.close()
+    centers = []
+    for line in lines:
+        if "(CENTRE" in line.split():
+            centers.append(line)
+    for line in centers:
+        index = int(line.split()[1])
+        x = float(line[23:36])
+        y = float(line[36:48])
+        z = float(line[48:60])
+        if index == atom1:
+            P1=(x,y,z)
+        elif index == atom2:
+            P2=(x,y,z)
+        elif index == atom3:
+            P3=(x,y,z)
+    nP1,nP2,nP3 = shift_plane_Bohr(P1,P2,P3,distance)
+    return nP1,nP2,nP3
+
+def write_command_file(P1,P2,P3):
+    f=open("multiwfn.txt","w+")
+    f.write("4\n")
+    f.write("9\n")
+    f.write("1\n")    
+    f.write("\n")    
+    f.write("5\n")
+    f.write(f"{P1[0]}, {P1[1]}, {P1[2]}\n")
+    f.write(f"{P2[0]}, {P2[1]}, {P2[2]}\n")
+    f.write(f"{P3[0]}, {P3[1]}, {P3[2]}\n")
+    f.write("-2\n")
+    f.write("2,2,2\n")
+    f.write("-8\n")
+    f.write("4\n")
+    f.write("4\n")
+    f.write("0\n")
+    f.write("-5\n")
+    f.write("-10\n")
+    f.write("EOF\n")
+    f.close()
+    return
+
+def run_command_file(wfn,output_image):
+    os.system(f"Multiwfn {wfn} < multiwfn.txt")
+    os.system("wait $!")
+    os.system(f"mv dislin.png {output_image}")
+    
+if __name__ == "__main__":
+    if len(sys.argv) == 7:
+        wfn   = sys.argv[1]
+        atom1 = int(sys.argv[2])
+        atom2 = int(sys.argv[3])
+        atom3 = int(sys.argv[4])
+        dist  = float(sys.argv[5])
+        image = sys.argv[6]
+        aP1,aP2,aP3 = Three_Atom_Plane_Shift(wfn,atom1,atom2,atom3,dist)
+        write_command_file(aP1,aP2,aP3)
+        run_command_file(wfn,image)
+
+    else:
+        print("Syntax Error: Expected 6 arguments")
+        print("\n <wfn file> <atom1> <atom2> <atom3> <offset distance> <output image filename>\n")
+    
