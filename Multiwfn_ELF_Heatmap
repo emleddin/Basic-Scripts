@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import os
 import sys
@@ -58,6 +60,7 @@ def write_command_file(P1,P2,P3):
     f.write("4\n")
     f.write("4\n")
     f.write("0\n")
+    f.write("-6\n")
     f.write("-5\n")
     f.write("-10\n")
     f.write("EOF\n")
@@ -68,6 +71,9 @@ def run_command_file(wfn,output_image):
     os.system(f"Multiwfn {wfn} < multiwfn.txt")
     os.system("wait $!")
     os.system(f"mv dislin.png {output_image}")
+    planefile=output_image.split(".")[0]+"_plane.txt"
+    os.system(f"mv plane.txt {planefile}")
+    os.system("rm multiwfn.txt")
     
 if __name__ == "__main__":
     if len(sys.argv) == 7:
