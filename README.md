@@ -28,3 +28,7 @@ This is a fairly simple script I wrote for python in which you can give it a seq
 #### Multiwfn ELF Passthrough Heatmap
 
 This is the same as the previous section, except that it creates an animated gif that follows a plane as it passes between two provided distances.  It's helpful if you want to see the electronic density in pseudo-3D.
+
+#### Subclustering
+
+Provides a means by which a larger trajectory may be subdivided by established cluster assignments from `cpptraj`.  Also produces a job script designed for use with a PBS scheduler.  The primary function of this program is to more easily sift through large trajectories to narrow down the selection of frames by desired criteria.
