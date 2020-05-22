@@ -13,7 +13,7 @@ def cou_file_to_EDA_grid(filename):
         z = float(line[2])
         cou_grid[x][y] = z
     return cou_grid
-    
+
 def vdw_file_to_EDA_grid(filename):
     data=np.genfromtxt(filename,delimiter=None,usecols=(1,2,3))
     rescount = int(data.max(axis=0)[1])
@@ -25,7 +25,8 @@ def vdw_file_to_EDA_grid(filename):
         vdw_grid[x][y] = z
     return vdw_grid
 
-def single_residue_EDA_row(vdw,cou,residue_number,buffer_space=0):
+def single_residue_EDA_row(vdw,cou,residue_number,buffer_space=2):
+    rescount = len(vdw)
     resnum = residue_number-1
     front = resnum + buffer_space
     back = resnum - buffer_space
@@ -41,21 +42,22 @@ def plot_EDA(courow,vdwrow,output_file):
     totalrow = courow + vdwrow
     fig = plt.figure(figsize=(10,8),dpi=300)
     x = np.arange(1,len(vdwrow)+1,1)
-    ax = fig.add_subplot(1,3,1)
+    ax = fig.add_subplot(3,1,1)
     ax.set_title("Van der Waals Energy - Total: "+str(round(sum(vdwrow),2))+" kcal/mol")
     ax.set_ylabel("Energy (kcal/mol)")
     ax.set_xlim(0,len(vdwrow)+1)
     ax.bar(x,vdwrow,align="center",color="green")
-    ax = fig.add_subplot(1,3,2)
+    ax = fig.add_subplot(3,1,2)
     ax.set_title("Coulomb Energy - Total: "+str(round(sum(courow),2))+" kcal/mol")
     ax.set_ylabel("Energy (kcal/mol)")
     ax.set_xlim(0,len(courow)+1)
-    ax.bar(x,courow,align="center",color="green")
-    ax = fig.add_subplot(1,3,3)
+    ax.bar(x,courow,align="center",color="blue")
+    ax = fig.add_subplot(3,1,3)
     ax.set_title("Combined Nonbonded Energy - Total: "+str(round(sum(totalrow),2))+" kcal/mol")
     ax.set_ylabel("Energy (kcal/mol)")
     ax.set_xlim(0,len(totalrow)+1)
-    ax.bar(x,totalrow,align="center",color="green")
+    ax.bar(x,totalrow,align="center",color="red")
+    fig.subplots_adjust(hspace=0.5)
     plt.savefig(output_file,dpi=300)
     return None
 
@@ -63,19 +65,19 @@ if __name__ == "__main__":
     if "help" in sys.argv:
         print("Help Response Coming Soon...")
     elif len(sys.argv) < 5:
-        print("Syntax Error:  Expected at least 4 arguments.\n\nplot_single_residue_EDA <coulomb filename> <vdw filename> <output filename> <target residue> [buffer]\n\n"
+        print("Syntax Error:  Expected at least 4 arguments.\n\nplot_single_residue_EDA <coulomb filename> <vdw filename> <output filename> <target residue> [buffer]\n\n")
     elif len(sys.argv) == 5:
         cou = cou_file_to_EDA_grid(sys.argv[1])
         vdw = vdw_file_to_EDA_grid(sys.argv[2])
         output = sys.argv[3]
-        resnum = sys.argv[4]
+        resnum = int(sys.argv[4])
         vdwrow,courow = single_residue_EDA_row(vdw,cou,resnum)
         plot_EDA(courow,vdwrow,output)
     elif len(sys.argv) == 6:
         cou = cou_file_to_EDA_grid(sys.argv[1])
         vdw = vdw_file_to_EDA_grid(sys.argv[2])
         output = sys.argv[3]
-        resnum = sys.argv[4]
-        buffer_space = sys.argv[5]
+        resnum = int(sys.argv[4])
+        buffer_space = int(sys.argv[5])
         vdwrow,courow = single_residue_EDA_row(vdw,cou,resnum,buffer_space)
         plot_EDA(courow,vdwrow,output)
