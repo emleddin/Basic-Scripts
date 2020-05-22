@@ -61,7 +61,7 @@ def plot_EDA(courow,vdwrow,output_file):
 
 if __name__ == "__main__":
     if "help" in sys.argv:
-        pass
+        print("Help Response Coming Soon...")
     elif len(sys.argv) < 5:
         print("Syntax Error:  Expected at least 4 arguments.\n\nplot_single_residue_EDA <coulomb filename> <vdw filename> <output filename> <target residue> [buffer]\n\n"
     elif len(sys.argv) == 5:
