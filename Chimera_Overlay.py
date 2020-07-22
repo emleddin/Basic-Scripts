@@ -4,6 +4,8 @@ import os
 from matplotlib import cm
 
 def attribute_to_residues(array,filename,attribute,description):
+    ### Takes an array of values (per residue) and created a chimera-compatible attribute file.
+    ### This file is used by chimera to assign color values to each residue.
     f = open(filename,"w+")
     f.write("#"+str(description)+"\n")
     f.write("attribute: "+str(attribute)+"\n")
@@ -14,7 +16,8 @@ def attribute_to_residues(array,filename,attribute,description):
     f.close()
     return
 
-def fragment_map_to_hex(cmap,ticks): ### converts a matplotlib.cm colormap into an array of hexcodes
+def fragment_map_to_hex(cmap,ticks): 
+    ### converts a matplotlib colormap into an array of hexcodes for use in Chimera
     colormap = cm.get_cmap(cmap)
     color_range=np.linspace(0,1,ticks)
     hex_map=[]
@@ -26,7 +29,6 @@ def fragment_map_to_hex(cmap,ticks): ### converts a matplotlib.cm colormap into 
         a = int(a*255)
         hex_map.append('#%02x%02x%02x' % (r,g,b))
     return hex_map
-
 
 def Chimera_attribute_color_string(hex_map,value_array):
     """
@@ -72,7 +74,7 @@ def Chimera_Overlay_Image(pdbfile,array,image_base,number_of_rotations=6,make_mo
     ### Build the Chimera command file
     chi_com_file=open(f"{image_base}.com","w+")
     chi_com_file.write(f"open {pdbfile}\n")                                               #open the pdb file.
-    chi_com_file.write(f"windowsize {windowsize[quality]}\n")                                  #sets windowsize to 800x600.
+    chi_com_file.write(f"windowsize {windowsize[quality]}\n")                               #sets windowsize.
     chi_com_file.write(f"background solid white\n")                                     #background to white.
     chi_com_file.write(f"~nucleotides\n")                                      # turn off nucleotide objects.
     chi_com_file.write(f"~display {hide_atom_mask}\n")                               #hide atoms in the mask.
@@ -81,8 +83,7 @@ def Chimera_Overlay_Image(pdbfile,array,image_base,number_of_rotations=6,make_mo
     chi_com_file.write(f"colorkey 0.96,0.05 0.99,0.25 labelSide ")    #puts the colorbar at the bottom right.
     chi_com_file.write(f"left/top labelColor black justification right {colorbar_string}\n")
     
-    chi_com_file.write("surface :417\ncolor pink,s,a :417\ntransparency 70,s :417\n")
-
+    ### Take rotational snapshots OR make a rotational movie.
     if make_movie == False: ### Do the rotation snapshots only if the user doesn't want a rotation movie.
         for i in range(number_of_rotations):
             chi_com_file.write(f"copy file {image_base}{i+1}.png png supersample ")
@@ -95,6 +96,13 @@ def Chimera_Overlay_Image(pdbfile,array,image_base,number_of_rotations=6,make_mo
 
     chi_com_file.write("stop\n")
     chi_com_file.close()
+    
+    ### Run chimera externally using the generated command file.
     os.system(f"chimera --gui {image_base}.com")
     if keep_files == False:
         os.system(f"rm {image_base}.dat {image_base}.com")
+
+if __name__ == "__main__":
+    print("This script is currently meant for use with other modules to generate chimera overlays.")
+    print("It will be updated in the future to a callable program that can work with the different \noutputs from cpptraj.")
+    pass
