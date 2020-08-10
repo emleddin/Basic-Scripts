@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+from matplotlib.lines import Line2D
+import argparse
+
+def Cluster_Plot(xfile,yfile,cfile,xlabel,ylabel,output):
+    clusters=np.genfromtxt(cfile,skip_header=1,usecols=1)
+    xdata=np.genfromtxt(xfile,skip_header=1,usecols=1)
+    ydata=np.genfromtxt(yfile,skip_header=1,usecols=1)
+    colormap =cm.get_cmap("jet")
+    fig=plt.figure(figsize=(10,10),dpi=300)
+    ax=fig.add_subplot(1,1,1)
+    for i in range(len(clusters)):
+        ax.scatter(xdata[i],ydata[i],color=colormap(clusters[i]/clusters.max()))
+    labels=["Cluster "+str(x) for x in range(int(clusters.max()+1))]
+    handles=[]
+    for i in range(int(clusters.max()+1)):
+        handles.append(Line2D([0],[0],color=colormap(i/clusters.max()),lw=4))
+    ax.legend(handles,labels)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    fig.savefig(output,dpi=300)
+    return 0
+
+if __name__=="__main__":
+    parser=argparse.ArgumentParser()
+    parser.add_argument("-x","-xf","--xfile",dest="xfile",required=True,help="Data file for x-axis.")
+    parser.add_argument("-y","-yf","--yfile",dest="yfile",required=True,help="Data file for y-axis.")
+    parser.add_argument("-c","-cf","--clusterfile",dest="cluster",required=True,help="Data file for cluster assignment (from cpptraj, the standard output file from the \"cluster\" command.)")
+    parser.add_argument("-o","--output",dest="output",required=True, help="Output filename.")
+    parser.add_argument("-xl","--xlabel",dest="xlabel",default="",help="Label for the x-axis.")
+    parser.add_argument("-yl","--ylabel",dest="ylabel",default="",help="Label for the y-axis.")
+    args=parser.parse_args()
+    Cluster_Plot(args.xfile,args.yfile,args.cluster,args.xlabel,args.ylabel,args.output)
