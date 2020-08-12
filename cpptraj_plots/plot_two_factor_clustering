@@ -15,9 +15,11 @@ def Cluster_Plot(xfile,yfile,cfile,xlabel,ylabel,output):
     for i in range(len(clusters)):
         ax.scatter(xdata[i],ydata[i],color=colormap(clusters[i]/clusters.max()))
     labels=["Cluster "+str(x) for x in range(int(clusters.max()+1))]
-    handles=[]
-    for i in range(int(clusters.max()+1)):
-        handles.append(Line2D([0],[0],color=colormap(i/clusters.max()),lw=4))
+    handles = [
+        Line2D([0], [0], color=colormap(i / clusters.max()), lw=4)
+        for i in range(int(clusters.max() + 1))
+    ]
+
     ax.legend(handles,labels)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
