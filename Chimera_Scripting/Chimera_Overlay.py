@@ -46,8 +46,8 @@ def Chimera_attribute_color_string(hex_map,value_array):
         else:
             colorbar_array.append("-")
         colorbar_array.append(hex_map[max_index-i])
-    attr_color_string = " ".join(x for x in attr_color_array)
-    colorbar_string = " ".join(x for x in colorbar_array)    
+    attr_color_string = " ".join(iter(attr_color_array))
+    colorbar_string = " ".join(iter(colorbar_array))
     return attr_color_string,colorbar_string
 
 def Chimera_Overlay_Image(pdbfile,array,image_base,number_of_rotations=6,make_movie=False,
@@ -105,4 +105,3 @@ def Chimera_Overlay_Image(pdbfile,array,image_base,number_of_rotations=6,make_mo
 if __name__ == "__main__":
     print("This script is currently meant for use with other modules to generate chimera overlays.")
     print("It will be updated in the future to a callable program that can work with the different \noutputs from cpptraj.")
-    pass
